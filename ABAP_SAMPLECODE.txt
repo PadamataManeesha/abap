@@ -1,0 +1,29 @@
+&---------------------------------------------------------------------*
+*& Report ZMM_GET_TEXT
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT zmm_get_text.
+
+DATA: v_matnr TYPE matnr.
+
+SELECT-OPTIONS: s_matnr FOR v_matnr.
+
+START-OF-SELECTION.
+
+*Get materials from master table
+  SELECT matnr FROM mara
+              INTO TABLE @DATA(it_mara)
+              WHERE matnr IN @s_matnr.
+*Get Material descriptions
+  SELECT matnr, maktx FROM makt
+                     INTO TABLE @DATA(it_makt)
+                     FOR ALL ENTRIES IN @it_mara
+                     WHERE matnr = @it_mara-matnr.
+
+*Display materials with descriptions
+  WRITE: /10 'Material', 40 'Material Description'.
+  LOOP AT it_makt INTO DATA(wa_final).
+    WRITE: / wa_final-matnr,
+             wa_final-maktx.
+  ENDLOOP.
